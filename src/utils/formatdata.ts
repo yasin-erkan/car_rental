@@ -22,6 +22,6 @@ export default function formatData(car: Car): ReturnType {
   // object to array
   const arr = Object.entries(car).filter((i) => accepted.includes(i[0]));
   console.log(arr)
-console.log(arr)
+
   return arr;
 }
