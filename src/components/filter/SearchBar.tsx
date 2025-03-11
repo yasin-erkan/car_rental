@@ -1,83 +1,104 @@
+import {FC, FormEvent, useState} from 'react';
 import ReactSelect from 'react-select';
-import { makes } from '../constants/index';
-import { FormEvent, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { OptionType } from '../../types';
+import {makes} from '../../utils/constants';
+import {useNavigate, useSearchParams} from 'react-router-dom';
 
-// 1. Component: SearchButton
-const SearchButton = ({ designs }: { designs: string }) => (
-  <button className={`ml-3 z-10 ${designs}`}>
-    <img src="/public/search.svg" width={40} height={40} />
-  </button>
-);
+type SelectOption = {
+  label: string;
+  value: string;
+};
 
-// 2. Component: SearchBar
-const SearchBar = () => {
-  const [make, setMake] = useState<string>('');
-  const [model, setModel] = useState<string>('');
+const Searchbar: FC = () => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
-  const [searchParams, setSearchParams] = useSearchParams();
+  // Get initial values from URL params if they exist
+  const initialMake = searchParams.get('make') || '';
+  const initialModel = searchParams.get('model') || '';
 
-  /*
-   * We need to convert the makes array into the format required by the select library
-   * e.g., "bmw" > {value: "bmw", label: "bmw"}
-   * 
-   * To prevent unnecessary computations on each render, 
-   * we use useMemo to cache the data.
-   */
-  const options: OptionType[] = useMemo(
-    () =>
-      makes.map((make) => ({
-        label: make,
-        value: make,
-      })),
-    []
+  const [selectedMake, setSelectedMake] = useState<SelectOption | null>(
+    initialMake ? {label: initialMake, value: initialMake} : null,
   );
+  const [model, setModel] = useState<string>(initialModel);
 
-  // Executes when the form is submitted
+  // Map the makes array to convert strings into objects
+  const options = makes.map(make => ({
+    label: make,
+    value: make,
+  }));
+
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Add data as search parameters to the URL
-    setSearchParams({ make, model });
+    // Preserve existing URL parameters
+    const params = new URLSearchParams();
+
+    // Update make and model parameters
+    if (selectedMake?.value) {
+      params.set('make', selectedMake.value);
+    } else {
+      params.delete('make');
+    }
+
+    if (model) {
+      params.set('model', model);
+    } else {
+      params.delete('model');
+    }
+
+    params.set('page', '1');
+
+    // Update the URL
+    navigate(`/?${params.toString()}`);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="searchbar gap-3">
-      <div className="searchbar-item">
-        <ReactSelect
-          defaultInputValue={searchParams.get('make')!}
-          onChange={(e) => e && setMake(e.value)}
-          className="w-full text-black"
-          options={options}
-        />
-        <SearchButton designs="sm:hidden" />
+    <form
+      onSubmit={handleSubmit}
+      className="searchbar flex gap-3 items-center justify-center">
+      <div className="searchbar-item items-end">
+        <div className="w-full flex flex-col">
+          <label htmlFor="make">Make</label>
+          <ReactSelect
+            className="w-full text-black"
+            options={options}
+            placeholder="Select a make"
+            value={selectedMake}
+            onChange={option => setSelectedMake(option as SelectOption | null)}
+            inputId="make"
+            classNamePrefix="select"
+          />
+        </div>
+
+        <button type="submit" className="ml-3 sm:hidden cursor-pointer">
+          <img src="/search.svg" alt="search" className="size-[40px]" />
+        </button>
       </div>
 
-      <div className="searchbar-item">
-        <img
-          width={25}
-          src="/model-icon.png"
-          alt="car"
-          className="absolute ml-4"
-        />
+      <div className="searchbar-item flex flex-col !items-start">
+        <label htmlFor="model">Model</label>
 
-        <input
-          defaultValue={searchParams.get('model')!}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setModel(e.target.value)
-          }
-          placeholder="e.g:Civic"
-          type="text"
-          className="searchbar-input rounded text-black"
-        />
+        <div className="w-full flex">
+          <div className="absolute ml-3 mt-1">
+            <img src="/model-icon.png" alt="model" className="size-[25px]" />
+          </div>
 
-        <SearchButton designs="sm:hidden" />
+          <input
+            type="text"
+            id="model"
+            className="searchbar-input rounded text-black bg-white"
+            placeholder="Enter model..."
+            value={model}
+            onChange={e => setModel(e.target.value)}
+          />
+
+          <button type="submit" className="ml-3 cursor-pointer">
+            <img src="/search.svg" alt="search" className="size-[40px]" />
+          </button>
+        </div>
       </div>
-
-      <SearchButton designs="max-sm:hidden" />
     </form>
   );
 };
 
-export default SearchBar;
+export default Searchbar;
