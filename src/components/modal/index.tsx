@@ -9,7 +9,7 @@ interface Props {
   car: Car;
 }
 
-const Modal: FC<Props> = ({ isOpen, close, car }) => {
+const Modal: FC<Props> = ({ isOpen, close, car, children }) => {
   return (
     isOpen && (
       <div className="fixed inset-0 bg-black/50 backdrop-blur-[2px] grid place-items-center z-20">
