@@ -2,6 +2,12 @@
 
 A React and TypeScript-based web application where you can filter and explore a vehicle database with a modern interface.
 
+
+
+![car_rental](https://github.com/user-attachments/assets/176d5b31-dbe1-460d-94f3-53bdd3d8d02e)
+
+
+
 ## ✨ Features
 
 - **Filter** vehicles by brand, model, and year  
