@@ -1,7 +1,7 @@
-import { FC, JSX } from "react";
+import { FC, ReactNode } from 'react';
 
 interface Props {
-  children: JSX.Element | string;
+  children: ReactNode;
 }
 
 const Warning: FC<Props> = ({ children }) => {
@@ -13,3 +13,4 @@ const Warning: FC<Props> = ({ children }) => {
 };
 
 export default Warning;
+
