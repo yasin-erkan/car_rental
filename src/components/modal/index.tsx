@@ -20,18 +20,22 @@ const Modal: FC<Props> = ({isOpen, close, car}) => {
             <img src="/close.svg" alt="close" />
           </button>
 
-        
           <Images car={car} />
 
-       
-          {formatData(car).map(([key, value]: [string, any]) => (
-            <p className="flex justify-between gap-20">
-              <span className="capitalize">{key}</span>
-              <span className="font-semibold capitalize">
-                {value === 'Y' ? 'Var' : value === 'N' ? 'Yok' : value || '-'}
-              </span>
-            </p>
-          ))}
+          {formatData(car).map(
+            ([key, value]: [string, string | number | boolean | null]) => (
+              <p className="flex justify-between gap-20">
+                <span className="capitalize">{key}</span>
+                <span className="font-semibold capitalize">
+                  {value === 'E'
+                    ? 'Exist'
+                    : value === 'N'
+                    ? 'Non-exist'
+                    : value || '-'}
+                </span>
+              </p>
+            ),
+          )}
         </div>
       </div>
     )
